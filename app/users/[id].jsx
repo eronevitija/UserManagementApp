@@ -40,13 +40,13 @@ export default function UserDetailsScreen() {
   if (!user) {
     return (
       <View style={localStyles.centered}>
-        <Text>No user found</Text>
+        <Text style={{color:'black'}}>No user found for Id {id}</Text>
       </View>
     );
   }
 
   return (
-    <ScrollView style={localStyles.container}>
+    <ScrollView style={[localStyles.container, {backgroundColor:'#fff'}]}>
       <View style={styles.userInfo}>
         <Text style={styles.userTitle}>Name: {user.name}</Text>
         <Text style={styles.userTitle}>Email: {user.email}</Text>
