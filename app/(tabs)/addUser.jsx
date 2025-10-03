@@ -5,11 +5,12 @@ import {
   TextInput, 
   KeyboardAvoidingView, 
   Platform, 
-  TouchableOpacity 
+  TouchableOpacity,
+  ScrollView, 
 } from 'react-native';
 import { useRouter } from 'expo-router';
 
-import styles from '../../styles/AddUser.styled';
+import styles from '../../styles/AddUser.styled'
 
 export default function AddUser({ handleAddUser }) {
   const [name, setName] = useState('');
@@ -41,8 +42,10 @@ export default function AddUser({ handleAddUser }) {
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      style={{flex:1,backgroundColor:'#f0f2f5'}}
     >
-      <View style={styles.userInfo}>
+      <ScrollView contentContainerStyle={styles.container}>
+        <View style={styles.card}>
         <Text style={styles.title}>Add New User</Text>
 
         <TextInput
@@ -51,6 +54,8 @@ export default function AddUser({ handleAddUser }) {
           placeholder="Name"
           onChangeText={setName}
           placeholderTextColor="#888"
+          returnKeyType='next'
+          onSubmitEditing={()=>{}}
         />
 
         <TextInput
@@ -61,14 +66,17 @@ export default function AddUser({ handleAddUser }) {
           keyboardType="email-address"
           autoCapitalize="none"
           placeholderTextColor="#888"
+          returnKeyType='done'
+          onSubmitEditing={handleSubmit}
         />
 
         {error ? <Text style={styles.errorTxt}>{error}</Text> : null}
 
         <TouchableOpacity style={styles.addBtn} onPress={handleSubmit}>
-          <Text style={styles.title}>Add</Text>
+          <Text style={styles.btnTxt}>Add</Text>
         </TouchableOpacity>
       </View>
+      </ScrollView>
     </KeyboardAvoidingView>
   );
 }

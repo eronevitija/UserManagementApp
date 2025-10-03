@@ -1,25 +1,33 @@
 import { StyleSheet } from "react-native"
 
 export default StyleSheet.create({
-    userInfo:{
-        paddingHorizontal:16,
+    container:{
+        flexGrow:1,
         justifyContent:'center',
-        backgroundColor:'#f2e9e9cc',   
-        borderRadius:10,
-        paddingVertical:25,   
+        alignItems:'center',
+        padding:20,
+        backgroundColor:'#f0f2f5'
+    },
+    card:{
+        backgroundColor:'#fff',
+        borderRadius:16,
+        width:'100%',
+        maxWidth:500,
+        padding:30,
     },
     title:{
-        fontSize:16,
+        fontSize:20,
         fontWeight:'bold',
         color:'#333',
-        marginBottom:10,
+        marginBottom:20,
         textAlign:'center'
     },
     textInput:{
         borderWidth:1,
         borderColor:'#ccc',
-        padding:20,
-        marginVertical:5,
+        marginBottom:15,
+        paddingHorizontal:20,
+        paddingVertical:16,
         borderRadius:8,
         backgroundColor:'#fff',
         fontSize:16,
@@ -28,7 +36,13 @@ export default StyleSheet.create({
     addBtn:{
         marginTop:10,
         borderRadius:10,
-
+        alignItems:'center',
+        backgroundColor:'#4CAF50',
+        paddingVertical:14,
+    },
+    btnTxt:{
+        fontSize:18,
+        color:'#fff'
     },
     errorTxt:{
         color:'#DD0303',

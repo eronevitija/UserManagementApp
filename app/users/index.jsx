@@ -13,6 +13,7 @@ import { useRouter } from 'expo-router';
 
 import Search from '../../components/Search';
 import AddUser from '../(tabs)/addUser';
+import { Ionicons, MaterialIcons } from '@expo/vector-icons';
 
 
 const USER_API_URL = 'https://jsonplaceholder.typicode.com/users';
@@ -38,7 +39,6 @@ const UserListScreen = () => {
         setLoading(false);
       }
     };
-
     fetchUsers();
   }, []);
 
@@ -79,14 +79,23 @@ const UserListScreen = () => {
 
   const renderUser = ({ item }) => (
     <TouchableOpacity 
-      style={styles.userInfo} 
+      style={styles.userCard} 
       onPress={() => router.push(`/users/${item.id}`)}
     >
-      <Text style={styles.userName}>{item.name}</Text>
+      <View style={styles.avatar}>
+      <Ionicons name='person-circle-outline' size={24} color={'#4CAF50'}/>
+      </View>
+     <View style={styles.userDetails}>
+       <Text style={styles.userName}>{item.name}</Text>
       <Text style={styles.userEmail}>{item.email}</Text>
       {!!item.company?.name && (
-        <Text style={styles.userCompany}>{item.company.name}</Text>
+        <View style={styles.companyRow}>
+          <MaterialIcons name='business' size={16} color={'#999'}/>
+          <Text style={styles.userCompany}>{item.company.name}</Text>
+        </View>
       )}
+     </View>
+     <Ionicons name='chevron-forward' size={20} color={'#aaa'}/>
     </TouchableOpacity>
   );
 
@@ -115,45 +124,82 @@ const UserListScreen = () => {
 };
 
 const styles = StyleSheet.create({
-  container: {
+    container: {
     flex: 1,
     paddingHorizontal: 16,
     paddingTop: 16,
     paddingBottom: 24,
+    backgroundColor: "#f9f9f9",
   },
-  addUserContainer: {
-    marginBottom: 50,
+  loading: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
   },
-  userInfo: {
-    padding: 20,
-    backgroundColor: '#f2e9e9cc',
-    marginBottom: 10,
-    borderRadius: 10,
+  userCard: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#fff",
+    padding: 16,
+    marginBottom: 12,
+    borderRadius: 12,
+    shadowColor: "#000",
+    shadowOpacity: 0.05,
+    shadowRadius: 6,
+    shadowOffset: { width: 0, height: 2 },
+    elevation: 3,
+  },
+  avatar: {
+    marginRight: 12,
+  },
+  userDetails: {
+    flex: 1,
   },
   userName: {
-    color: '#000',
-    fontWeight: 'bold',
-    fontSize: 15,
+    fontWeight: "600",
+    fontSize: 16,
+    color: "#222",
   },
   userEmail: {
-    color: '#222',
-    marginTop: 5,
     fontSize: 14,
-  },
-  userCompany: {
-    color: '#333',
-    fontSize: 14,
+    color: "#555",
     marginTop: 2,
   },
+  companyRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginTop: 4,
+  },
+  userCompany: {
+    marginLeft: 4,
+    fontSize: 13,
+    color: "#777",
+  },
   emptyUser: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginTop: 30,
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: 40,
   },
   emptyText: {
     fontSize: 16,
-    color: '#444',
+    color: "#555",
+    marginTop: 8,
   },
+  fab: {
+    position: "absolute",
+    bottom: 30,
+    right: 20,
+    backgroundColor: "#4CAF50",
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    justifyContent: "center",
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOpacity: 0.2,
+    shadowRadius: 6,
+    shadowOffset: { width: 0, height: 3 },
+    elevation: 5,}
 });
 
 export default UserListScreen;
