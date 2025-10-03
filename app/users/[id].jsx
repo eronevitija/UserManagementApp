@@ -73,4 +73,4 @@ const localStyles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-});
+})

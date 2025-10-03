@@ -2,13 +2,14 @@ import { StyleSheet } from "react-native";
 
 export default StyleSheet.create({
   container:{
-        paddingTop:20,
-        paddingHorizontal:16,
+        marginVertical:10,
       },
       searchContainer:{
         flexDirection:'row',
         alignItems:'center',
         backgroundColor:'#f0f0f0',
+        borderColor:'#ccc',
+        borderWidth:1,
         paddingHorizontal:10,
         borderRadius:10
       },
@@ -21,6 +22,10 @@ export default StyleSheet.create({
        color:'#000',
       },
       searchIcon:{
-        color:'#333'
+        color:'#333',
+        marginRight:8,
+      },
+      clearBtn:{
+        padding:4,
       }
 })

@@ -14,6 +14,7 @@ import { useRouter } from 'expo-router';
 import Search from '../../components/Search';
 import AddUser from '../(tabs)/addUser';
 
+
 const USER_API_URL = 'https://jsonplaceholder.typicode.com/users';
 
 const UserListScreen = () => {
@@ -48,6 +49,7 @@ const UserListScreen = () => {
       return;
     }
 
+  
     const lowerQuery = searchQuery.toLowerCase();
     const filtered = users.filter(
       (user) =>
@@ -93,7 +95,8 @@ const UserListScreen = () => {
       <View style={styles.addUserContainer}>
         <AddUser handleAddUser={handleAddUser} />
       </View>
-      <Search search={searchQuery} setSearch={setSearchQuery} />
+     
+      <Search searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
       <FlatList
         data={filteredUsers}
         keyExtractor={(item) => String(item.id ?? item.email)}
