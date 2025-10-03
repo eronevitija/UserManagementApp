@@ -10,7 +10,7 @@ export default function AddUser({handleAddUser}) {
     const [email, setEmail] = useState('');
     const [error, setError] = useState('');
 
-      const { addUser } = useUsers();
+
       const router = useRouter();
  
 

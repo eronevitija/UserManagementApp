@@ -1,152 +1,155 @@
-import React, { useEffect, useMemo, useState } from 'react';  
-import { View, Text, FlatList, StyleSheet, Alert, TouchableOpacity} from 'react-native';
+import React, { useEffect, useState, useCallback } from 'react';
+import { 
+  View, 
+  Text, 
+  FlatList, 
+  StyleSheet, 
+  Alert, 
+  TouchableOpacity 
+} from 'react-native';
 import axios from 'axios';
-import Search from '../../components/Search'
-import AddUser from '../(tabs)/addUser';
-import { useNavigation } from 'expo-router';
-import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useRouter } from 'expo-router';
 
+import Search from '../../components/Search';
+import AddUser from '../(tabs)/addUser';
 
+const USER_API_URL = 'https://jsonplaceholder.typicode.com/users';
 
 const UserListScreen = () => {
+  const [users, setUsers] = useState([]);
+  const [filteredUsers, setFilteredUsers] = useState([]);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [loading, setLoading] = useState(true);
 
-    const [users, setUsers] = useState([]);
-    const [filteredUsers, setFilteredUsers] = useState([]);
-    const [searchUsers, setSearchUsers] = useState('');
-    const [loading, setLoading] = useState(true);
-    const url =  `https://jsonplaceholder.typicode.com/users`;
-
-
-    const router = useRouter();
- 
-    useEffect(() => {
-
-          axios.get(url)
-          .then((re) => {
-            setUsers(re.data);
-            setFilteredUsers(re.data);
-          })
-          .catch((error) => {
-            Alert.alert('Failed to get users',error)
-          })
-          .finally(()=>setLoading(false));
-        
-        
-    },[url]);
-
-        useEffect(() => {
-        if (!searchUsers) {
-            setFilteredUsers(users);
-        }
-        else{
-            const searchLowerCase = searchUsers.toLowerCase();
-            const filteredUsers = users.filter(
-            (user) =>
-            user.name.toLowerCase().includes(searchLowerCase) ||
-            user.email.toLowerCase().includes(searchLowerCase)
-      );
-      setFilteredUsers(filteredUsers);
-        }
-    },[searchUsers, users])
+  const router = useRouter();
 
 
-    const handleAddUser = (newUser) => {
-      if (!newUser.name || !newUser.email)  {
-        Alert.alert('Name and Email are required');
-        return;
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        const { data } = await axios.get(USER_API_URL);
+        setUsers(data);
+        setFilteredUsers(data);
+      } catch (error) {
+        Alert.alert('Failed to get users', error.message || 'Unknown error');
+      } finally {
+        setLoading(false);
       }
+    };
 
-      const id = Date.now();
-      const addUser = {
-        id,
-        name:newUser.name,
-        email:newUser.email,
-        company: {name: newUser.company || ''}
-      };
+    fetchUsers();
+  }, []);
 
-      setUsers([addUser, ...users]);
-      setFilteredUsers([addUser, ...filteredUsers])
+
+  useEffect(() => {
+    if (!searchQuery.trim()) {
+      setFilteredUsers(users);
+      return;
     }
-   
-    
+
+    const lowerQuery = searchQuery.toLowerCase();
+    const filtered = users.filter(
+      (user) =>
+        user.name.toLowerCase().includes(lowerQuery) ||
+        user.email.toLowerCase().includes(lowerQuery)
+    );
+    setFilteredUsers(filtered);
+  }, [searchQuery, users]);
+
+
+  const handleAddUser = useCallback((newUser) => {
+    if (!newUser.name || !newUser.email) {
+      Alert.alert('Name and Email are required');
+      return;
+    }
+
+    const userToAdd = {
+      id: Date.now(),
+      name: newUser.name,
+      email: newUser.email,
+      company: { name: newUser.company || '' },
+    };
+
+    setUsers((prev) => [userToAdd, ...prev]);
+    setFilteredUsers((prev) => [userToAdd, ...prev]);
+  }, []);
+
+  const renderUser = ({ item }) => (
+    <TouchableOpacity 
+      style={styles.userInfo} 
+      onPress={() => router.push(`/users/${item.id}`)}
+    >
+      <Text style={styles.userName}>{item.name}</Text>
+      <Text style={styles.userEmail}>{item.email}</Text>
+      {!!item.company?.name && (
+        <Text style={styles.userCompany}>{item.company.name}</Text>
+      )}
+    </TouchableOpacity>
+  );
 
   return (
     <SafeAreaView style={styles.container}>
-     <View style={{marginBottom:50}}>
-       <AddUser
-      handleAddUser={handleAddUser}
-      />
-     </View>
-      <Search 
-      search={searchUsers} 
-      setSearch={setSearchUsers}
-      />
-      <FlatList 
+      <View style={styles.addUserContainer}>
+        <AddUser handleAddUser={handleAddUser} />
+      </View>
+      <Search search={searchQuery} setSearch={setSearchQuery} />
+      <FlatList
         data={filteredUsers}
         keyExtractor={(item) => String(item.id ?? item.email)}
+        renderItem={renderUser}
         ListEmptyComponent={
-          <View style={styles.emptyUser}>
-            <Text style={styles.emptyText}>No Users</Text>
-          </View>
-
+          !loading && (
+            <View style={styles.emptyUser}>
+              <Text style={styles.emptyText}>No Users</Text>
+            </View>
+          )
         }
-        renderItem={({item}) => (
-         <TouchableOpacity style={styles.userInfo} onPress={()=>router.push(`/users/${item.id}`)}>
-          <View style={{width:'100%'}}>
-              <Text style={styles.userName}>{item.name}</Text>
-            <Text style={styles.userEmail}>{item.email}</Text>
-            {!!item.company?.name && <Text style={styles.userCompany}>{item.company.name}</Text>}
-          </View>
-        
-         </TouchableOpacity>
-        )}
       />
     </SafeAreaView>
-  )
+  );
 };
 
 const styles = StyleSheet.create({
-  container:{
-        flex:1,
-        paddingHorizontal:16,
-        paddingTop:16,
-        paddingBottom:24,
-
-        
-    },
-    userInfo:{
-        padding:20,
-        backgroundColor:'#f2e9e9cc',
-        marginBottom:10,
-        borderRadius:10,
-    },
-    userName:{
-        color:'#000',
-        fontWeight:'bold',
-        fontSize:15,
-    },
-    userEmail:{
-        color:'#222',
-        marginTop:5,
-        fontSize:14
-
-    },
-    userCompany:{
-      color:'#333',
-      fontSize:14,
-      marginTop:2
-    },
-    emptyUser:{
-      justifyContent:'center',
-      alignItems:'center',
-      marginTop:30
-    },
-    emptyText:{
-      fontSize:16,
-      color:'#444'
-    }
-
+  container: {
+    flex: 1,
+    paddingHorizontal: 16,
+    paddingTop: 16,
+    paddingBottom: 24,
+  },
+  addUserContainer: {
+    marginBottom: 50,
+  },
+  userInfo: {
+    padding: 20,
+    backgroundColor: '#f2e9e9cc',
+    marginBottom: 10,
+    borderRadius: 10,
+  },
+  userName: {
+    color: '#000',
+    fontWeight: 'bold',
+    fontSize: 15,
+  },
+  userEmail: {
+    color: '#222',
+    marginTop: 5,
+    fontSize: 14,
+  },
+  userCompany: {
+    color: '#333',
+    fontSize: 14,
+    marginTop: 2,
+  },
+  emptyUser: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 30,
+  },
+  emptyText: {
+    fontSize: 16,
+    color: '#444',
+  },
 });
 
-export default UserListScreen
+export default UserListScreen;
