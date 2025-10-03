@@ -1,41 +1,58 @@
+import { FontAwesome5, Ionicons, MaterialIcons } from "@expo/vector-icons";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
-  View,
-  Text,
+  ActivityIndicator,
+  Alert,
   ScrollView,
   StyleSheet,
-  ActivityIndicator,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
-import { useLocalSearchParams } from "expo-router";
-import axios from "axios";
-import { Ionicons, MaterialIcons, FontAwesome5 } from "@expo/vector-icons";
-
-const USER_API_URL = "https://jsonplaceholder.typicode.com/users";
+import { useUsers } from "../../contexts/UsersContext";
 
 export default function UserDetailsScreen() {
   const { id } = useLocalSearchParams();
+  const { users, deleteUser } = useUsers();
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const router = useRouter();
 
   useEffect(() => {
     if (!id) return;
 
-    const fetchUser = async () => {
-      try {
-        const { data } = await axios.get(`${USER_API_URL}/${id}`);
-        setUser(data);
-      } catch (error) {
-        if (error instanceof Error) {
-          console.error("Failed to fetch user:", error.message);
-        }
-        console.error("Failed to fetch user:", error.message || error);
-      } finally {
-        setLoading(false);
-      }
-    };
+    const foundUser = users.find(
+      (u) => String(u.id) === String(id) || u.email === id
+    );
+    if (foundUser) {
+      setUser(foundUser);
+      setLoading(false);
+      return;
+    }
 
-    fetchUser();
-  }, [id]);
+    setUser(null);
+    setLoading(false);
+  }, [id, users]);
+
+  const handleDelete = () => {
+    Alert.alert(
+      "Delete User",
+      "Are you sure you want to delete this user?",
+      [
+        { text: "Cancel", style: "cancel" },
+        {
+          text: "Delete",
+          style: "destructive",
+          onPress: () => {
+            deleteUser(user.id);
+            router.replace("/");
+          },
+        },
+      ],
+      { cancelable: true }
+    );
+  };
 
   if (loading) {
     return (
@@ -69,12 +86,12 @@ export default function UserDetailsScreen() {
 
         <View style={localStyles.infoRow}>
           <Ionicons name="call-outline" size={22} color="#4CAF50" />
-          <Text style={localStyles.infoText}>{user.phone}</Text>
+          <Text style={localStyles.infoText}>{user.phone || "N/A"}</Text>
         </View>
 
         <View style={localStyles.infoRow}>
           <Ionicons name="globe-outline" size={22} color="#4CAF50" />
-          <Text style={localStyles.infoText}>{user.website}</Text>
+          <Text style={localStyles.infoText}>{user.website || "N/A"}</Text>
         </View>
 
         <View style={localStyles.infoRow}>
@@ -85,6 +102,14 @@ export default function UserDetailsScreen() {
               : "N/A"}
           </Text>
         </View>
+
+        <TouchableOpacity
+          style={localStyles.deleteBtn}
+          onPress={handleDelete}
+        >
+          <MaterialIcons name="delete-outline" size={20} color="#fff" />
+          <Text style={localStyles.deleteBtnText}>Delete User</Text>
+        </TouchableOpacity>
       </View>
     </ScrollView>
   );
@@ -133,5 +158,20 @@ const localStyles = StyleSheet.create({
     fontSize: 16,
     color: "#333",
     marginLeft: 10,
+  },
+  deleteBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#e53935",
+    paddingVertical: 12,
+    borderRadius: 8,
+    marginTop: 24,
+    justifyContent: "center",
+  },
+  deleteBtnText: {
+    color: "#fff",
+    fontWeight: "bold",
+    fontSize: 16,
+    marginLeft: 8,
   },
 });

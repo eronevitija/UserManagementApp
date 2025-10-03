@@ -1,55 +1,37 @@
-import React, { useEffect, useState, useCallback } from 'react';
-import { 
-  View, 
-  Text, 
-  FlatList, 
-  StyleSheet, 
-  Alert, 
-  TouchableOpacity 
-} from 'react-native';
-import axios from 'axios';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
+import React, { useCallback, useEffect, useState } from 'react';
+import {
+  Alert,
+  FlatList,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View
+} from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
-import Search from '../../components/Search';
-import AddUser from '../(tabs)/addUser';
 import { Ionicons, MaterialIcons } from '@expo/vector-icons';
+import AddUser from '../(tabs)/addUser';
+import Search from '../../components/Search';
 
-
-const USER_API_URL = 'https://jsonplaceholder.typicode.com/users';
+import { useUsers } from '../../contexts/UsersContext';
 
 const UserListScreen = () => {
-  const [users, setUsers] = useState([]);
+  const { users, isLoading, error, loadUsers, addUser } = useUsers();
   const [filteredUsers, setFilteredUsers] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
-  const [loading, setLoading] = useState(true);
 
   const router = useRouter();
 
-
   useEffect(() => {
-    const fetchUsers = async () => {
-      try {
-        const { data } = await axios.get(USER_API_URL);
-        setUsers(data);
-        setFilteredUsers(data);
-      } catch (error) {
-        Alert.alert('Failed to get users', error.message || 'Unknown error');
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchUsers();
+    loadUsers();
   }, []);
-
 
   useEffect(() => {
     if (!searchQuery.trim()) {
       setFilteredUsers(users);
       return;
     }
-
-  
     const lowerQuery = searchQuery.toLowerCase();
     const filtered = users.filter(
       (user) =>
@@ -59,23 +41,18 @@ const UserListScreen = () => {
     setFilteredUsers(filtered);
   }, [searchQuery, users]);
 
-
   const handleAddUser = useCallback((newUser) => {
     if (!newUser.name || !newUser.email) {
       Alert.alert('Name and Email are required');
       return;
     }
-
-    const userToAdd = {
-      id: Date.now(),
+    addUser({
       name: newUser.name,
       email: newUser.email,
-      company: { name: newUser.company || '' },
-    };
-
-    setUsers((prev) => [userToAdd, ...prev]);
-    setFilteredUsers((prev) => [userToAdd, ...prev]);
-  }, []);
+      phone: newUser.phone || '',
+      website: newUser.website || '',
+    });
+  }, [addUser]);
 
   const renderUser = ({ item }) => (
     <TouchableOpacity 
@@ -83,19 +60,19 @@ const UserListScreen = () => {
       onPress={() => router.push(`/users/${item.id}`)}
     >
       <View style={styles.avatar}>
-      <Ionicons name='person-circle-outline' size={24} color={'#4CAF50'}/>
+        <Ionicons name='person-circle-outline' size={24} color={'#4CAF50'}/>
       </View>
-     <View style={styles.userDetails}>
-       <Text style={styles.userName}>{item.name}</Text>
-      <Text style={styles.userEmail}>{item.email}</Text>
-      {!!item.company?.name && (
-        <View style={styles.companyRow}>
-          <MaterialIcons name='business' size={16} color={'#999'}/>
-          <Text style={styles.userCompany}>{item.company.name}</Text>
-        </View>
-      )}
-     </View>
-     <Ionicons name='chevron-forward' size={20} color={'#aaa'}/>
+      <View style={styles.userDetails}>
+        <Text style={styles.userName}>{item.name}</Text>
+        <Text style={styles.userEmail}>{item.email}</Text>
+        {!!item.company?.name && (
+          <View style={styles.companyRow}>
+            <MaterialIcons name='business' size={16} color={'#999'}/>
+            <Text style={styles.userCompany}>{item.company.name}</Text>
+          </View>
+        )}
+      </View>
+      <Ionicons name='chevron-forward' size={20} color={'#aaa'}/>
     </TouchableOpacity>
   );
 
@@ -104,14 +81,13 @@ const UserListScreen = () => {
       <View style={styles.addUserContainer}>
         <AddUser handleAddUser={handleAddUser} />
       </View>
-     
       <Search searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
       <FlatList
         data={filteredUsers}
         keyExtractor={(item) => String(item.id ?? item.email)}
         renderItem={renderUser}
         ListEmptyComponent={
-          !loading && (
+          !isLoading && (
             <View style={styles.emptyUser}>
               <Text style={styles.emptyText}>No Users</Text>
             </View>
@@ -124,7 +100,7 @@ const UserListScreen = () => {
 };
 
 const styles = StyleSheet.create({
-    container: {
+  container: {
     flex: 1,
     paddingHorizontal: 16,
     paddingTop: 16,
@@ -199,7 +175,8 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.2,
     shadowRadius: 6,
     shadowOffset: { width: 0, height: 3 },
-    elevation: 5,}
+    elevation: 5,
+  }
 });
 
 export default UserListScreen;
