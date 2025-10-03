@@ -105,6 +105,7 @@ const UserListScreen = () => {
             </View>
           )
         }
+        style={{ marginTop:20 }}
       />
     </SafeAreaView>
   );
