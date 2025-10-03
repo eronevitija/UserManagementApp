@@ -41,7 +41,6 @@ export default function AddUser({ handleAddUser }) {
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      style={{ flex: 1 }}
     >
       <View style={styles.userInfo}>
         <Text style={styles.title}>Add New User</Text>
@@ -51,7 +50,7 @@ export default function AddUser({ handleAddUser }) {
           value={name}
           placeholder="Name"
           onChangeText={setName}
-          placeholderTextColor="#333"
+          placeholderTextColor="#888"
         />
 
         <TextInput
@@ -61,7 +60,7 @@ export default function AddUser({ handleAddUser }) {
           onChangeText={setEmail}
           keyboardType="email-address"
           autoCapitalize="none"
-          placeholderTextColor="#333"
+          placeholderTextColor="#888"
         />
 
         {error ? <Text style={styles.errorTxt}>{error}</Text> : null}

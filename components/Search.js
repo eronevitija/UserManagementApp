@@ -9,12 +9,12 @@ export default function Search({search, setSearch}) {
       <View style={styles.searchContainer}>
         <Ionicons name='search' size={20} color={'black'} style={styles.searchIcon}/>
         <TextInput 
-        style={styles.searchInput}
         placeholder='Search by name or email'
         value={search}
         onChangeText={setSearch}
         autoCorrect={false}
-        placeholderTextColor={'#000'}
+        placeholderTextColor={'#888'}
+        style={styles.searchInput}
         />
 
       </View>

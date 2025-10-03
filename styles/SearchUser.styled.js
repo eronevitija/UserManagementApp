@@ -18,7 +18,7 @@ export default StyleSheet.create({
        height:44,
        paddingLeft:20,
        borderWidth:0,
-       color:'#000' 
+       color:'#000',
       },
       searchIcon:{
         color:'#333'

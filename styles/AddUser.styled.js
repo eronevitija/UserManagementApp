@@ -2,10 +2,11 @@ import { StyleSheet } from "react-native"
 
 export default StyleSheet.create({
     userInfo:{
-        flex:1,
         paddingHorizontal:16,
         justifyContent:'center',
-        backgroundColor:'#f2e9e9cc',      
+        backgroundColor:'#f2e9e9cc',   
+        borderRadius:10,
+        paddingVertical:25,   
     },
     title:{
         fontSize:16,
