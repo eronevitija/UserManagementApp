@@ -1,41 +1,58 @@
 import { Tabs } from 'expo-router';
 import React from 'react';
+import { Ionicons } from '@expo/vector-icons';
 
-
-import { Colors } from '@/constants/theme';
-import { useColorScheme } from '@/hooks/use-color-scheme';
 
 export default function TabLayout() {
-  const colorScheme = useColorScheme();
-
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
-        headerShown: false,
-       
+        headerShown:false,
+        headerStyle:{backgroundColor: "#f5f5f5"},
+        headerShadowVisible:false,
+        tabBarActiveTintColor:'#af240fff',
+        tabBarInactiveTintColor:'#666666',
+        tabBarShowLabel:false,
+
+       tabBarStyle:{
+        backgroundColor:'#f5f5f5',
+        // borderTopWidth:0,
+        height:60,
+       },
+
+       tabBarLabelStyle:{
+        fontSize:12,
+       },
+
+       tabBarItemStyle:{
+        marginTop:8
+       }
       }}>
-      <Tabs.Screen
-        name="users"
-        options={{
-          title: 'Users',
-          // tabBarIcon: ({ color }) => <IconSymbol size={28} name="person.3" color={color} />,
-        }}
-      />
+      
       <Tabs.Screen
         name="index"
         options={{
-          title: 'Home',
-          // tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons 
+            name='home-outline' 
+            size={size} 
+            color={color}
+            />
+          )
         }}
       />
       <Tabs.Screen
-        name="explore"
+        name="addUser"
         options={{
-          title: 'Explore',
-          // tabBarIcon: ({ color }) => <IconSymbol size={28} name="paperplane.fill" color={color} />,
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons 
+            name='person-add-outline' 
+            size={size} 
+            color={color}/>
+          )
         }}
       />
+   
     </Tabs>
   );
 }

@@ -1,8 +1,13 @@
 import React, { useEffect, useMemo, useState } from 'react';  
-import { View, Text, FlatList, StyleSheet, Alert, Button} from 'react-native';
-import Search from '../components/Search';
+import { View, Text, FlatList, StyleSheet, Alert, TouchableOpacity} from 'react-native';
 import axios from 'axios';
-import { router } from 'expo-router';
+import Search from '../../components/Search'
+import AddUser from '../(tabs)/addUser';
+import { useNavigation } from 'expo-router';
+import { useRouter } from 'expo-router';
+import { SafeAreaView } from 'react-native-safe-area-context';
+
+
 
 const UserListScreen = () => {
 
@@ -11,6 +16,9 @@ const UserListScreen = () => {
     const [searchUsers, setSearchUsers] = useState('');
     const [loading, setLoading] = useState(true);
     const url =  `https://jsonplaceholder.typicode.com/users`;
+
+
+    const router = useRouter();
  
     useEffect(() => {
 
@@ -43,16 +51,37 @@ const UserListScreen = () => {
     },[searchUsers, users])
 
 
+    const handleAddUser = (newUser) => {
+      if (!newUser.name || !newUser.email)  {
+        Alert.alert('Name and Email are required');
+        return;
+      }
+
+      const id = Date.now();
+      const addUser = {
+        id,
+        name:newUser.name,
+        email:newUser.email,
+        company: {name: newUser.company || ''}
+      };
+
+      setUsers([addUser, ...users]);
+      setFilteredUsers([addUser, ...filteredUsers])
+    }
    
     
 
   return (
-    <View style={styles.container}>
-      <Button 
-      title='Add New User'
-      onPress={() => router.push('/add')}
+    <SafeAreaView style={styles.container}>
+     <View style={{marginBottom:50}}>
+       <AddUser
+      handleAddUser={handleAddUser}
       />
-      <Search search={searchUsers} setSearch={setSearchUsers}/>
+     </View>
+      <Search 
+      search={searchUsers} 
+      setSearch={setSearchUsers}
+      />
       <FlatList 
         data={filteredUsers}
         keyExtractor={(item) => String(item.id ?? item.email)}
@@ -63,25 +92,30 @@ const UserListScreen = () => {
 
         }
         renderItem={({item}) => (
-          <View style={styles.userInfo}>
-            <Text style={styles.userName}>{item.name}</Text>
+         <TouchableOpacity style={styles.userInfo} onPress={()=>router.push(`/users/${item.id}`)}>
+          <View style={{width:'100%'}}>
+              <Text style={styles.userName}>{item.name}</Text>
             <Text style={styles.userEmail}>{item.email}</Text>
             {!!item.company?.name && <Text style={styles.userCompany}>{item.company.name}</Text>}
           </View>
+        
+         </TouchableOpacity>
         )}
       />
-    </View>
+    </SafeAreaView>
   )
 };
 
 const styles = StyleSheet.create({
   container:{
         flex:1,
-        padding:16
+        paddingHorizontal:16,
+        paddingTop:16,
+        paddingBottom:24,
+
+        
     },
     userInfo:{
-        justifyContent:'center',
-        alignItems:'center',
         padding:20,
         backgroundColor:'#f2e9e9cc',
         marginBottom:10,

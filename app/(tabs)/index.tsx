@@ -1,32 +1,48 @@
-import { Image } from 'expo-image';
-import { Platform, StyleSheet, Text } from 'react-native';
-import UserListScreen from '../../screens/UserListScreen';
-
+import { View, StyleSheet, Text, TouchableOpacity,} from 'react-native';
+import { useRouter } from 'expo-router';
+import React from 'react';
 
 
 export default function HomeScreen() {
-  return (
-   
-    <UserListScreen />
 
+  const router = useRouter();
+
+  const listAllUsers = () => {
+    router.push('/users')
+  };
+
+  return (
+    <View style={styles.container}>
+      <Text style={styles.title}>User Management App</Text>
+      <TouchableOpacity style={styles.btnContainer} onPress={listAllUsers}>
+        <Text style={styles.btnText}>View All Users</Text>
+      </TouchableOpacity>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
+  container:{
+    flex:1,
+    justifyContent:'center',
+    alignItems:'center',
+    backgroundColor:'#fff'
+
   },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
+  title:{
+    fontSize:20,
+    color:'#334443',
+    fontWeight:'bold',
   },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
+  btnContainer:{
+    backgroundColor:'#2F5755',
+    padding:20,
+    borderRadius:10,
+    marginTop:10
   },
+  btnText:{
+    fontSize:16,
+    color:'#fff',
+    fontWeight:'bold'
+  }
 });
