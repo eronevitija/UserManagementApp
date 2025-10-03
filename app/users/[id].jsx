@@ -1,43 +1,76 @@
-import { View, Text, ScrollView } from 'react-native'
-import React, { useEffect, useState } from 'react'
-import styles from '../../styles/UserDetails.styled'
-import {useLocalSearchParams} from 'expo-router';
+import React, { useEffect, useState } from 'react';
+import { View, Text, ScrollView, StyleSheet, ActivityIndicator } from 'react-native';
+import { useLocalSearchParams } from 'expo-router';
 import axios from 'axios';
 
+import styles from '../../styles/UserDetails.styled';
+
+const USER_API_URL = 'https://jsonplaceholder.typicode.com/users';
+
 export default function UserDetailsScreen() {
+  const { id } = useLocalSearchParams();
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-    const { id } = useLocalSearchParams();
-    const [user, setUser] = useState(null);
+  useEffect(() => {
+    if (!id) return;
 
-   
-    useEffect(()=>{
-      if (!id) return;
-      axios.get(`https://jsonplaceholder.typicode.com/users/${id}`)
-      .then((res)=>setUser(res.data))
-      .catch((error)=>console.error(error))
-    },[id])
+    const fetchUser = async () => {
+      try {
+        const { data } = await axios.get(`${USER_API_URL}/${id}`);
+        setUser(data);
+      } catch (error) {
+        console.error('Failed to fetch user:', error.message || error);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-if (!user) {
-  return(
-    <View style={{flex:1,justifyContent:'center',alignItems:'center'}}>
-      <Text>No user!</Text>
-    </View>
-  )
-}
+    fetchUser();
+  }, [id]);
+
+  if (loading) {
+    return (
+      <View style={localStyles.centered}>
+        <ActivityIndicator size="large" color="#666" />
+      </View>
+    );
+  }
+
+  if (!user) {
+    return (
+      <View style={localStyles.centered}>
+        <Text>No user found</Text>
+      </View>
+    );
+  }
 
   return (
-    <ScrollView style={{flex:1, padding:16}}>
+    <ScrollView style={localStyles.container}>
       <View style={styles.userInfo}>
         <Text style={styles.userTitle}>Name: {user.name}</Text>
         <Text style={styles.userTitle}>Email: {user.email}</Text>
         <Text style={styles.userTitle}>Phone: {user.phone}</Text>
         <Text style={styles.userTitle}>Website: {user.website}</Text>
         <Text style={styles.userTitle}>
-        Address: 
-       {user.address ? `${user.address.street}, ${user.address.city}, ${user.address.zipcode}`  :'N/A'}
+          Address:{' '}
+          {user.address
+            ? `${user.address.street}, ${user.address.city}, ${user.address.zipcode}`
+            : 'N/A'}
         </Text>
       </View>
-
     </ScrollView>
-  )
+  );
 }
+
+const localStyles = StyleSheet.create({
+  container: {
+    flex: 1,
+    padding: 16,
+  },
+  centered: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+});
